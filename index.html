@@ -946,7 +946,7 @@ body {
 </div>
 
 <script>
-const DATA_URL = null; // 内嵌数据，无需外部文件
+const DATA_URL = 'data.json'; // 从外部文件加载数据
 // =================
 
 let ALL_DATA = [];
@@ -1079,8 +1079,16 @@ async function loadData(isManual = false) {
   }
   
   try {
-    // 使用内嵌数据
-    ALL_DATA = EMBEDDED_DATA;
+    let data;
+    if (DATA_URL) {
+      const resp = await fetch(DATA_URL + '?t=' + Date.now());
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const json = await resp.json();
+      data = json.records || json;
+    } else {
+      data = EMBEDDED_DATA;
+    }
+    ALL_DATA = data;
     
     status.textContent = '✅ ' + new Date().toLocaleTimeString('zh-CN') + ' 已加载';
     status.className = 'sync-status ok';
